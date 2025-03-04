@@ -1,4 +1,4 @@
-name: PIG 镜像 action
+name: hub-mirror
 
 on:
   workflow_dispatch:
