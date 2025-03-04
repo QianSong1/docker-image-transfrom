@@ -115,5 +115,5 @@ jobs:
           echo "架构：${TARGET_ARCH}"
           gh issue comment ${{ github.event.issue.number }} -b "镜像 ${IMAGE_NAME} 同步中...[详情请查看](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) 如果还需要同步, 请重新提交issue"
           gh issue edit ${{ github.event.issue.number }} --add-label "succeeded" -b "IMAGE SYNC"
-          gh issue comment ${{ github.event.issue.number }} -b "镜像同步完成 ${NEW_NAME"
+          gh issue comment ${{ github.event.issue.number }} -b "镜像同步完成 ${NEW_NAME}"
           gh issue close ${{ github.event.issue.number }} --reason "completed"
