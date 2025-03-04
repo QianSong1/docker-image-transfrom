@@ -1,0 +1,97 @@
+name: hub-mirror-by-issue
+
+on:
+  issues:
+    types:
+      - opened
+
+# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
+permissions:
+  issues: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'hub-mirror')
+    env:
+      QYWX_ROBOT_URL: ${{ secrets.QYWX_ROBOT_URL }}
+    steps:
+      - name: Login to Docker Registry
+        env:
+          TITLE: "${{ github.event.issue.title }}"
+        run: |
+          #[原镜像名称IMAGE_NAME]:busybox[同步后镜像名称NEW_NAME]:busybox[镜像版本IMAGE_VERSION]:latest[仓库地址TARGET_REGISTRY]:registry.cn-hangzhou.aliyuncs.com[空间名称TARGET_REPOSITORY]:library[平台 amd64(默认)、arm64、arm/v7等等TARGET_ARCH]:amd64
+          # 原始镜像
+          IAMGE_NAME="$(echo "${TITLE}" | awk -F ":" '{print $2}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 同步后镜像
+          NEW_NAME="$(echo "${TITLE}" | awk -F ":" '{print $3}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 镜像版本tag
+          IMAGE_VERSION="$(echo "${TITLE}" | awk -F ":" '{print $4}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 仓库地址
+          TARGET_REGISTRY="$(echo "${TITLE}" | awk -F ":" '{print $5}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 仓库名称空间
+          TARGET_REPOSITORY="$(echo "${TITLE}" | awk -F ":" '{print $6}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 架构
+          TARGET_ARCH="$(echo "${TITLE}" | awk -F ":" '{print $7}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} ${TARGET_REGISTRY}
+
+      - name: Pull, tag, and push Docker image
+        env:
+          TITLE: "${{ github.event.issue.title }}"
+        run: |
+          #[原镜像名称IMAGE_NAME]:busybox[同步后镜像名称NEW_NAME]:busybox[镜像版本IMAGE_VERSION]:latest[仓库地址TARGET_REGISTRY]:registry.cn-hangzhou.aliyuncs.com[空间名称TARGET_REPOSITORY]:library[平台 amd64(默认)、arm64、arm/v7等等TARGET_ARCH]:amd64
+          # 原始镜像
+          IAMGE_NAME="$(echo "${TITLE}" | awk -F ":" '{print $2}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 同步后镜像
+          NEW_NAME="$(echo "${TITLE}" | awk -F ":" '{print $3}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 镜像版本tag
+          IMAGE_VERSION="$(echo "${TITLE}" | awk -F ":" '{print $4}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 仓库地址
+          TARGET_REGISTRY="$(echo "${TITLE}" | awk -F ":" '{print $5}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 仓库名称空间
+          TARGET_REPOSITORY="$(echo "${TITLE}" | awk -F ":" '{print $6}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 架构
+          TARGET_ARCH="$(echo "${TITLE}" | awk -F ":" '{print $7}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          if [ "${TARGET_ARCH}" != "" ]; then
+            docker pull --platform ${TARGET_ARCH} ${IMAGE_NAME }:${IMAGE_VERSION}
+          else
+            docker pull ${IMAGE_NAME}:${IMAGE_VERSION}
+          fi
+          docker tag ${IMAGE_NAME}:${IMAGE_VERSION} ${TARGET_REGISTRY}/${TARGET_REPOSITORY}/${NEW_NAME}:${IMAGE_VERSION}
+          docker push ${TARGET_REGISTRY}/${TARGET_REPOSITORY}/${NEW_NAME}:${IMAGE_VERSION}
+
+      - name: qyweixin send message
+        if: ${{ env.QYWX_ROBOT_URL != '' }}
+        uses: chf007/action-wechat-work@master
+        env:
+          WECHAT_WORK_BOT_WEBHOOK: ${{secrets.QYWX_ROBOT_URL}}
+          IMAGE_URL: ${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/${{ github.event.inputs.NEW_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}
+        with:
+          msgtype: markdown
+          content: |
+            # 镜像同步成功
+            ```
+            ${{ env.IMAGE_URL }}
+            ```
+
+      - name: Close issue
+        env:
+          TITLE: "${{ github.event.issue.title }}"
+        run: |
+          #[原镜像名称IMAGE_NAME]:busybox[同步后镜像名称NEW_NAME]:busybox[镜像版本IMAGE_VERSION]:latest[仓库地址TARGET_REGISTRY]:registry.cn-hangzhou.aliyuncs.com[空间名称TARGET_REPOSITORY]:library[平台 amd64(默认)、arm64、arm/v7等等TARGET_ARCH]:amd64
+          # 原始镜像
+          IAMGE_NAME="$(echo "${TITLE}" | awk -F ":" '{print $2}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 同步后镜像
+          NEW_NAME="$(echo "${TITLE}" | awk -F ":" '{print $3}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 镜像版本tag
+          IMAGE_VERSION="$(echo "${TITLE}" | awk -F ":" '{print $4}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 仓库地址
+          TARGET_REGISTRY="$(echo "${TITLE}" | awk -F ":" '{print $5}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 仓库名称空间
+          TARGET_REPOSITORY="$(echo "${TITLE}" | awk -F ":" '{print $6}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          # 架构
+          TARGET_ARCH="$(echo "${TITLE}" | awk -F ":" '{print $7}' | awk -F "[" '{print $1}' | awk '{print $1}')"
+          gh issue comment ${{ github.event.issue.number }} -b "镜像 ${IMAGE_NAME} 同步中...[详情请查看](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) 如果还需要同步, 请重新提交issue"
+          gh issue edit ${{ github.event.issue.number }} --add-label "succeeded" -b "IMAGE SYNC"
+          gh issue comment ${{ github.event.issue.number }} -b "镜像同步完成 ${NEW_NAME"
+          gh issue close ${{ github.event.issue.number }} --reason "completed"
