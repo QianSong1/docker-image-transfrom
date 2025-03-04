@@ -98,13 +98,17 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 🔹 **示例截图**  
 
- 
+ ![image-20250305004719688](img/image-20250305004719688.png) 
 
 
 
 ### 4️⃣ 查看结果
 
 - 当 hub-mirror 执行完毕后，你将在你的目标 Docker 仓库中看到推送过来的镜像。
+
+🔹 **示例截图**  
+
+![image-20250305011000070](img/image-20250305011000070.png) 
 
 
 
