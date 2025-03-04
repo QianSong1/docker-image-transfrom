@@ -16,6 +16,9 @@ jobs:
     env:
       QYWX_ROBOT_URL: ${{ secrets.QYWX_ROBOT_URL }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Login to Docker Registry
         env:
           TITLE: "${{ github.event.issue.title }}"
