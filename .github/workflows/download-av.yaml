@@ -1,0 +1,88 @@
+name: download-av
+
+on:
+  workflow_dispatch:
+    inputs:
+      SOURCE_URL:
+        description: "资源下载链接"
+        required: true
+        default: ""
+      TARGET_FORMAT:
+        description: "资源格式(mp3,mp4,avi,flac...)"
+        required: true
+        default: "mp4"
+      IMAGE_VERSION:
+        description: "生成的镜像版本"
+        required: true
+        default: "latest"
+      TARGET_REGISTRY:
+        description: "保存镜像的仓库地址"
+        required: true
+        default: "registry.cn-hangzhou.aliyuncs.com"
+      TARGET_REPOSITORY:
+        description: "镜像仓库的空间名称"
+        required: true
+        default: "library"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      QYWX_ROBOT_URL: "${{ secrets.QYWX_ROBOT_URL }}"
+    steps:
+      - name: Login to Docker Registry
+        run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}" "${{ github.event.inputs.TARGET_REGISTRY }}"
+
+      - name: Build, tag, and push Docker image
+        run: |
+          # 下载链接
+          source_url="${{ github.event.inputs.SOURCE_URL }}"
+          # 资源文件格式
+          target_format="${{ github.event.inputs.TARGET_FORMAT }}"
+          {
+          printf "%s\\n" "# 构建阶段"
+          printf "%s\\n" "FROM alpine:latest AS builder"
+          printf "%s\\n" ""
+          printf "%s\\n" "LABEL maintainer=\"Qian Song <xxxxxxxxx@gmail.com>\""
+          printf "%s\\n" ""
+          printf "%s\\n" "WORKDIR /tmp"
+          printf "%s\\n" ""
+          printf "%s\\n" "ENV DOWANLOAD_AV_VERSION=\"v1.0\""
+          printf "%s\\n" ""
+          printf "%s\\n" "# hadolint ignore=DL3018"
+          printf "%s\\n" "RUN apk add --no-cache wget \\"
+          printf "%s\\n" "        curl \\"
+          printf "%s\\n" "    && wget \"${source_url}\" -O \"girl.${target_format}\""
+          printf "%s\\n" ""
+          printf "%s\\n" "# 最终阶段"
+          printf "%s\\n" "FROM alpine:latest AS final"
+          printf "%s\\n" ""
+          printf "%s\\n" "LABEL maintainer=\"Qian Song <xxxxxxxxx@gmail.com>\""
+          printf "%s\\n" ""
+          printf "%s\\n" "WORKDIR /tmp"
+          printf "%s\\n" ""
+          printf "%s\\n" "ENV DOWANLOAD_AV_VERSION=\"v1.0\""
+          printf "%s\\n" ""
+          printf "%s\\n" "# hadolint ignore=DL3018"
+          printf "%s\\n" "RUN apk add --no-cache bash"
+          printf "%s\\n" ""
+          printf "%s\\n" "COPY --from=builder \"/tmp/girl.${target_format}\" \"/tmp/girl.${target_format}\""
+          printf "%s\\n" ""
+          printf "%s\\n" "CMD [\"/bin/bash\"]"
+          } >"Dockerfile"
+          docker build -f Dockerfile -t "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/download-av:${{ github.event.inputs.IMAGE_VERSION }}" .
+          docker push "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/download-av:${{ github.event.inputs.IMAGE_VERSION }}"
+
+      - name: qyweixin send message
+        if: ${{ env.QYWX_ROBOT_URL != '' }}
+        uses: chf007/action-wechat-work@master
+        env:
+          WECHAT_WORK_BOT_WEBHOOK: "${{secrets.QYWX_ROBOT_URL}}"
+          IMAGE_URL: "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/download-av:${{ github.event.inputs.IMAGE_VERSION }}"
+        with:
+          msgtype: markdown
+          content: |
+            # 镜像构建成功
+            ```
+            "${{ env.IMAGE_URL }}"
+            ```
