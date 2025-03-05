@@ -26,6 +26,7 @@ jobs:
         run: |
           #[原镜像名称IMAGE_NAME]:busybox[同步后镜像名称NEW_NAME]:busybox[镜像版本IMAGE_VERSION]:latest[仓库地址TARGET_REGISTRY]:registry.cn-hangzhou.aliyuncs.com[空间名称TARGET_REPOSITORY]:library[平台 amd64(默认)、arm64、arm/v7等等TARGET_ARCH]:amd64
           # 原始镜像
+          declare -x IMAGE_NAME
           IMAGE_NAME="$(echo "${TITLE}" | awk -F ":" '{print $2}' | awk -F "[" '{print $1}' | awk '{print $1}')"
           echo "原始镜像：${IMAGE_NAME}"
           # 同步后镜像
