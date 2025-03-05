@@ -27,6 +27,7 @@ on:
         description: "平台 amd64(默认)、arm64、arm/v7"
         required: false
         default: "amd64"
+
 jobs:
   build:
     runs-on: ubuntu-latest

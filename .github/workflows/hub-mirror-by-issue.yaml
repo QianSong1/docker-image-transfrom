@@ -44,8 +44,8 @@ jobs:
           # 架构
           TARGET_ARCH="$(echo "${TITLE}" | awk -F ":" '{print $7}' | awk -F "[" '{print $1}' | awk '{print $1}')"
           echo "架构：${TARGET_ARCH}"
-          gh issue comment ${{ github.event.issue.number }} -b "$(echo -e "原始镜像：${IMAGE_NAME}\n同步后镜像：${NEW_NAME}\n镜像版本tag：${IMAGE_VERSION}\n仓库地址：${TARGET_REGISTRY}\n仓库名称空间：${TARGET_REPOSITORY}\n架构：${TARGET_ARCH}")"
-          gh issue comment ${{ github.event.issue.number }} -b "镜像 ${IMAGE_NAME} 同步中...[详情请查看](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) 如果还需要同步, 请重新提交issue"
+          gh issue comment "${{ github.event.issue.number }}" -b "$(echo -e "原始镜像：${IMAGE_NAME}\n同步后镜像：${NEW_NAME}\n镜像版本tag：${IMAGE_VERSION}\n仓库地址：${TARGET_REGISTRY}\n仓库名称空间：${TARGET_REPOSITORY}\n架构：${TARGET_ARCH}")"
+          gh issue comment "${{ github.event.issue.number }}" -b "镜像 ${IMAGE_NAME} 同步中...[详情请查看](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) 如果还需要同步, 请重新提交issue"
           echo "image_name=${IMAGE_NAME}" >>"${GITHUB_OUTPUT}"
           echo "new_name=${NEW_NAME}" >>"${GITHUB_OUTPUT}"
           echo "image_version=${IMAGE_VERSION}" >>"${GITHUB_OUTPUT}"
@@ -88,7 +88,7 @@ jobs:
         uses: chf007/action-wechat-work@master
         env:
           WECHAT_WORK_BOT_WEBHOOK: "${{secrets.QYWX_ROBOT_URL}}"
-          IMAGE_URL: ${{ steps.print-image-info.outputs.target_registry }}/${{ steps.print-image-info.outputs.target_repository }}/${{ steps.print-image-info.outputs.new_name }}:${{ steps.print-image-info.outputs.image_version }}
+          IMAGE_URL: "${{ steps.print-image-info.outputs.target_registry }}/${{ steps.print-image-info.outputs.target_repository }}/${{ steps.print-image-info.outputs.new_name }}:${{ steps.print-image-info.outputs.image_version }}"
         with:
           msgtype: markdown
           content: |
@@ -107,9 +107,9 @@ jobs:
           TARGET_REPOSITORY: "${{ steps.print-image-info.outputs.target_repository }}"
           TARGET_ARCH: "${{ steps.print-image-info.outputs.target_arch }}"
         run: |
-          gh issue edit ${{ github.event.issue.number }} --add-label "succeeded" -b "IMAGE SYNC"
-          gh issue comment ${{ github.event.issue.number }} -b "$(echo -e "镜像同步完成 ${NEW_NAME} ，新的镜像 ${TARGET_REGISTRY}/${TARGET_REPOSITORY}/${NEW_NAME}:${IMAGE_VERSION}\n\n快速拉取命令，Docker客户端\n\`\`\`sh\ndocker image pull ${TARGET_REGISTRY}/${TARGET_REPOSITORY}/${NEW_NAME}:${IMAGE_VERSION}\n\`\`\`\n\nContainerd客户端拉取命令\n\`\`\`sh\nctr -n k8s.io image pull ${TARGET_REGISTRY}/${TARGET_REPOSITORY}/${NEW_NAME}:${IMAGE_VERSION}\n\`\`\`\n")"
-          gh issue close ${{ github.event.issue.number }} --reason "completed"
+          gh issue comment "${{ github.event.issue.number }}" -b "$(echo -e "镜像同步完成 ${NEW_NAME} ，新的镜像 ${TARGET_REGISTRY}/${TARGET_REPOSITORY}/${NEW_NAME}:${IMAGE_VERSION}\n\n快速拉取命令，Docker客户端\n\`\`\`sh\ndocker image pull ${TARGET_REGISTRY}/${TARGET_REPOSITORY}/${NEW_NAME}:${IMAGE_VERSION}\n\`\`\`\n\nContainerd客户端拉取命令\n\`\`\`sh\nctr -n k8s.io image pull ${TARGET_REGISTRY}/${TARGET_REPOSITORY}/${NEW_NAME}:${IMAGE_VERSION}\n\`\`\`\n")"
+          gh issue edit "${{ github.event.issue.number }}" --add-label "succeeded" -b "IMAGE SYNC"
+          gh issue close "${{ github.event.issue.number }}" --reason "completed"
 
       - name: Failed Sync and Close issue
         if: failure()
@@ -122,6 +122,6 @@ jobs:
           TARGET_REPOSITORY: "${{ steps.print-image-info.outputs.target_repository }}"
           TARGET_ARCH: "${{ steps.print-image-info.outputs.target_arch }}"
         run: |
-          gh issue comment ${{ github.event.issue.number }} -b "镜像 ${IMAGE_NAME} 同步失败[详情请查看](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})，请检查 image 是否存在, 如果还需要同步, 请重新提交正确的issue"
-          gh issue edit ${{ github.event.issue.number }} --add-label "failure" -b "IMAGE SYNC"
-          gh issue close ${{ github.event.issue.number }} --reason "not planned"
+          gh issue comment "${{ github.event.issue.number }}" -b "镜像 ${IMAGE_NAME} 同步失败...[详情请查看](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})，请检查 image参数，如果还需要同步，请重新提交正确的issue"
+          gh issue edit "${{ github.event.issue.number }}" --add-label "failure" -b "IMAGE SYNC"
+          gh issue close "${{ github.event.issue.number }}" --reason "not planned"

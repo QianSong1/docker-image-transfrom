@@ -168,6 +168,7 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 - 依次创建以下标签
   - `hub-mirror`
   - `succeeded`
+  - `failure`
 
 🔹 **示例截图**  
 
