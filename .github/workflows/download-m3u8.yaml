@@ -82,7 +82,7 @@ jobs:
         uses: chf007/action-wechat-work@master
         env:
           WECHAT_WORK_BOT_WEBHOOK: "${{secrets.QYWX_ROBOT_URL}}"
-          IMAGE_URL: "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/download-av:${{ github.event.inputs.IMAGE_VERSION }}"
+          IMAGE_URL: "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/download-m3u8:${{ github.event.inputs.IMAGE_VERSION }}"
         with:
           msgtype: markdown
           content: |
