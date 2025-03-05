@@ -31,31 +31,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      QYWX_ROBOT_URL: ${{ secrets.QYWX_ROBOT_URL }}
+      QYWX_ROBOT_URL: "${{ secrets.QYWX_ROBOT_URL }}"
     steps:
       - name: Login to Docker Registry
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} ${{ github.event.inputs.TARGET_REGISTRY }}
+        run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}" "${{ github.event.inputs.TARGET_REGISTRY }}"
 
       - name: Pull, tag, and push Docker image
         run: |
           if [ "${{ github.event.inputs.TARGET_ARCH }}" != "" ]; then
-            docker pull --platform ${{ github.event.inputs.TARGET_ARCH }} ${{ github.event.inputs.IMAGE_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}
+            docker pull --platform "${{ github.event.inputs.TARGET_ARCH }}" "${{ github.event.inputs.IMAGE_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}"
           else
-            docker pull ${{ github.event.inputs.IMAGE_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}
+            docker pull "${{ github.event.inputs.IMAGE_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}"
           fi
-          docker tag ${{ github.event.inputs.IMAGE_NAME }}:${{ github.event.inputs.IMAGE_VERSION }} ${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/${{ github.event.inputs.NEW_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}
-          docker push ${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/${{ github.event.inputs.NEW_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}
+          docker tag "${{ github.event.inputs.IMAGE_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}" "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/${{ github.event.inputs.NEW_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}"
+          docker push "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/${{ github.event.inputs.NEW_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}"
 
       - name: qyweixin send message
         if: ${{ env.QYWX_ROBOT_URL != '' }}
         uses: chf007/action-wechat-work@master
         env:
-          WECHAT_WORK_BOT_WEBHOOK: ${{secrets.QYWX_ROBOT_URL}}
-          IMAGE_URL: ${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/${{ github.event.inputs.NEW_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}
+          WECHAT_WORK_BOT_WEBHOOK: "${{secrets.QYWX_ROBOT_URL}}"
+          IMAGE_URL: "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/${{ github.event.inputs.NEW_NAME }}:${{ github.event.inputs.IMAGE_VERSION }}"
         with:
           msgtype: markdown
           content: |
             # 镜像同步成功
             ```
-            ${{ env.IMAGE_URL }}
+            "${{ env.IMAGE_URL }}"
             ```
