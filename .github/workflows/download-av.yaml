@@ -39,6 +39,7 @@ jobs:
           source_url="${{ github.event.inputs.SOURCE_URL }}"
           # 资源文件格式
           target_format="${{ github.event.inputs.TARGET_FORMAT }}"
+          # 生成Dockerfile
           {
           printf "%s\\n" "# 构建阶段"
           printf "%s\\n" "FROM alpine:latest AS builder"
@@ -70,6 +71,11 @@ jobs:
           printf "%s\\n" ""
           printf "%s\\n" "CMD [\"/bin/bash\"]"
           } >"Dockerfile"
+          # 查看Dockerfile文件
+          echo "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"
+          cat Dockerfile
+          echo "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>"
+          # 构建并推送镜像
           docker build -f Dockerfile -t "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/download-av:${{ github.event.inputs.IMAGE_VERSION }}" .
           docker push "${{ github.event.inputs.TARGET_REGISTRY }}/${{ github.event.inputs.TARGET_REPOSITORY }}/download-av:${{ github.event.inputs.IMAGE_VERSION }}"
 
