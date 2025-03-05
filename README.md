@@ -69,13 +69,13 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 ## 1.手动使用流程
 
-### 1️⃣ Fork 本项目
+### 💠 Fork 本项目
 
 `Fork` 该项目，后续所有操作都在你 `Fork` 的仓库中进行。
 
 
 
-### 2️⃣ 绑定账号
+### 💠 绑定账号
 
 - 进入项目 `Settings` → `Secrets and variables` → `Actions`
 - 选择 `New repository secret`，并添加以下 `Secrets`：
@@ -90,7 +90,7 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 
 
-### 3️⃣ 运行Action
+### 💠 运行Action
 
 - 进入项目 `Actions` 
 - 找到 `hub-mirror`工作流
@@ -102,7 +102,7 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 
 
-### 4️⃣ 查看结果
+### 💠 查看结果
 
 - 当 hub-mirror 执行完毕后，你将在你的目标 Docker 仓库中看到推送过来的镜像。
 
@@ -112,13 +112,13 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 
 
-### 5️⃣ 微信说明
+### 💠 微信说明
 
 - 如果填写了企业微信群机器人 URL，你将会收到操作的通知。
 
 
 
-### 6️⃣ 注意事项
+### 💠 注意事项
 
 - 请确保你的 Docker 用户名和密码是正确的，以便 docker-mirror 可以顺利地拉取和推送镜像。
 
@@ -128,13 +128,13 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 ## 2.创建issue触发使用流程
 
-### 1️⃣ Fork 本项目
+### 💠 Fork 本项目
 
 `Fork` 该项目，后续所有操作都在你 `Fork` 的仓库中进行。
 
 
 
-### 2️⃣ 绑定账号
+### 💠 绑定账号
 
 - 进入项目 `Settings` → `Secrets and variables` → `Actions`
 - 选择 `New repository secret`，并添加以下 `Secrets`：
@@ -149,7 +149,7 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 
 
-### 3️⃣ 设置Action权限
+### 💠 设置Action权限
 
 - 进入项目 `Settings`→`Actions` →`General`→`Workflow permissions`
 - 找到 `[√] Read and write permissions`
@@ -161,7 +161,7 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 
 
-### 4️⃣ 添加标签
+### 💠 添加标签
 
 - 进入项目`Issues`→`Labels`
 
@@ -176,7 +176,7 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 
 
-### 5️⃣ 创建issue触发同步
+### 💠 创建issue触发同步
 
 - 按照模板修改issue标题，所有参数都是从标题里边获取的
 - 确保标题里边参数正确，不然会同步失败
@@ -187,7 +187,7 @@ DockerIT is a multi platform container image proxy service that supports Docker 
 
 
 
-### 6️⃣ 注意事项
+### 💠 注意事项
 
 - 请确保你的 Docker 用户名和密码是正确的，以便 docker-mirror 可以顺利地拉取和推送镜像。
 
